@@ -30,24 +30,24 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'string', 'lowercase', 'email:rfc', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:pembeli,jastiper'],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'name' => trim($validated['name']),
+            'email' => mb_strtolower(trim($validated['email'])),
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect($user->role === 'jastiper' ? route('dashboard.jastiper') : route('dashboard.pembeli'));
+        return redirect($user->role === 'jastiper' ? route('dashboard.jastiper') : route('katalog'));
     }
 }

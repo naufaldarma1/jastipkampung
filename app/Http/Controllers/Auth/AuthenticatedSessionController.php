@@ -29,9 +29,9 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
-        $dashboard = $user->role === 'jastiper' ? route('dashboard.jastiper') : route('dashboard.pembeli');
+        $redirectUrl = $user->role === 'jastiper' ? route('dashboard.jastiper') : route('katalog');
 
-        return redirect()->intended($dashboard);
+        return redirect()->intended($redirectUrl);
     }
 
     /**
