@@ -18,7 +18,15 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-[#FDF8F5] text-gray-800 antialiased selection:bg-[#B5502E] selection:text-white">
-        <div class="min-h-screen flex flex-col justify-center items-center py-10 px-4">
+        <div class="min-h-screen flex flex-col items-center py-8 px-4">
+            <div class="w-full max-w-lg">
+                <a href="{{ url('/') }}" onclick="if (document.referrer && new URL(document.referrer).origin === window.location.origin) { event.preventDefault(); window.history.back(); }" class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-[#8C5D42] transition hover:bg-[#F5EBE4] hover:text-[#B5502E] focus:outline-none focus:ring-2 focus:ring-[#B5502E]/30">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6M9 12h12" /></svg>
+                    Kembali
+                </a>
+            </div>
+
+            <div class="flex w-full flex-1 flex-col items-center justify-center">
             
             <!-- Logo -->
             <a href="/" class="mb-8 flex items-center gap-2 hover:opacity-90 transition">
@@ -39,6 +47,7 @@
                     {{ $bottom }}
                 </div>
             @endif
+            </div>
         </div>
     </body>
 </html>

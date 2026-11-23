@@ -21,6 +21,36 @@
         <div class="min-h-screen">
             @include('layouts.navigation')
 
+            @php
+                $backUrl = route('katalog');
+                $forceBackFallback = false;
+
+                if (request()->routeIs('katalog')) {
+                    $backUrl = url('/');
+                    $forceBackFallback = true;
+                } elseif (request()->routeIs('cart.*', 'checkout.index')) {
+                    $backUrl = route('katalog');
+                    $forceBackFallback = true;
+                } elseif (request()->routeIs('payment.*')) {
+                    $backUrl = route('pesanan.index');
+                    $forceBackFallback = true;
+                } elseif (request()->routeIs('pesanan.*')) {
+                    $backUrl = route('katalog');
+                    $forceBackFallback = true;
+                } elseif (request()->routeIs('jastiper.trips.create')) {
+                    $backUrl = route('dashboard.jastiper');
+                } elseif (request()->routeIs('profile.*')) {
+                    $backUrl = Auth::user()->role === 'jastiper' ? route('dashboard.jastiper') : route('dashboard.pembeli');
+                }
+            @endphp
+
+            <div class="mx-auto w-full max-w-7xl px-4 pt-5 sm:px-6 lg:px-8">
+                <a href="{{ $backUrl }}" data-force-fallback="{{ $forceBackFallback ? 'true' : 'false' }}" onclick="if (this.dataset.forceFallback !== 'true' && document.referrer && new URL(document.referrer).origin === window.location.origin) { event.preventDefault(); window.history.back(); }" class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-[#8C5D42] transition hover:bg-[#F5EBE4] hover:text-[#B5502E] focus:outline-none focus:ring-2 focus:ring-[#B5502E]/30">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6M9 12h12" /></svg>
+                    Kembali
+                </a>
+            </div>
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow">
