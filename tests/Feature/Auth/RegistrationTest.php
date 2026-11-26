@@ -23,9 +23,24 @@ class RegistrationTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'role' => 'pembeli',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('katalog', absolute: false));
+    }
+
+    public function test_new_jastiper_users_can_register(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Jastiper Baru',
+            'email' => 'jastiper@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'jastiper',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard.jastiper', absolute: false));
     }
 }

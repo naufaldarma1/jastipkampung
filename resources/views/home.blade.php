@@ -273,8 +273,14 @@
                     <div class="text-[10px] font-bold text-[#B5502E] bg-[#FDF8F5] border border-[#EADBD1] px-2 py-0.5 rounded">Sisa 4 slot</div>
                 </div>
                 <h3 class="font-extrabold text-lg leading-snug mb-2 group-hover:text-[#B5502E] transition">Serabi Notosuman & Abon Mesran Solo</h3>
+                <div class="mb-2.5 flex items-center gap-1.5 text-[11px]">
+                    <span class="inline-flex items-center gap-0.5 rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 font-extrabold text-amber-800"><span class="text-amber-500">★</span> 4.9</span>
+                    <a href="{{ route('jastiper.profile', 'rizky-f') }}#ulasan" class="text-gray-500 font-semibold hover:text-[#B5502E] hover:underline">(42 penilaian)</a>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-gray-600 font-semibold">128 terjual</span>
+                </div>
                 <div class="text-xs text-gray-500 mb-5 leading-relaxed">
-                    Jastiper: <span class="font-bold text-gray-800">Rizky F.</span> (FT UNNES '22) &bull; <span class="text-[#B5502E] font-semibold">Terverifikasi KTM</span>
+                    Jastiper: <a href="{{ route('jastiper.profile', 'rizky-f') }}" class="font-bold text-gray-800 hover:text-[#B5502E] underline decoration-[#EADBD1]">Rizky F.</a> (FT UNNES '22) &bull; <span class="text-[#B5502E] font-semibold">★ 4.9 Toko</span>
                 </div>
                 
                 <div class="mb-5">
@@ -325,8 +331,14 @@
                     <div class="text-[10px] font-bold text-[#B5502E] bg-[#FDF8F5] border border-[#EADBD1] px-2 py-0.5 rounded">Sisa 2 slot</div>
                 </div>
                 <h3 class="font-extrabold text-lg leading-snug mb-2 group-hover:text-[#B5502E] transition">Mendoan Mentah Baturraden & Jenang Jaket Asli</h3>
+                <div class="mb-2.5 flex items-center gap-1.5 text-[11px]">
+                    <span class="inline-flex items-center gap-0.5 rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 font-extrabold text-amber-800"><span class="text-amber-500">★</span> 4.9</span>
+                    <a href="{{ route('jastiper.profile', 'annisa-d') }}#ulasan" class="text-gray-500 font-semibold hover:text-[#B5502E] hover:underline">(36 penilaian)</a>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-gray-600 font-semibold">98 terjual</span>
+                </div>
                 <div class="text-xs text-gray-500 mb-5 leading-relaxed">
-                    Jastiper: <span class="font-bold text-gray-800">Annisa D.</span> (FBS UNNES '21) &bull; <span class="text-[#B5502E] font-semibold">Terverifikasi KTM</span>
+                    Jastiper: <a href="{{ route('jastiper.profile', 'annisa-d') }}" class="font-bold text-gray-800 hover:text-[#B5502E] underline decoration-[#EADBD1]">Annisa D.</a> (FBS UNNES '21) &bull; <span class="text-[#B5502E] font-semibold">★ 4.9 Toko</span>
                 </div>
                 
                 <div class="mb-5">
@@ -377,8 +389,14 @@
                     <div class="text-[10px] font-bold text-[#B5502E] bg-[#FDF8F5] border border-[#EADBD1] px-2 py-0.5 rounded">Sisa 6 slot</div>
                 </div>
                 <h3 class="font-extrabold text-lg leading-snug mb-2 group-hover:text-[#B5502E] transition">Jenang Kudus Mubarok & Lentog Tanjung Box</h3>
+                <div class="mb-2.5 flex items-center gap-1.5 text-[11px]">
+                    <span class="inline-flex items-center gap-0.5 rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 font-extrabold text-amber-800"><span class="text-amber-500">★</span> 4.8</span>
+                    <a href="{{ route('jastiper.profile', 'bagas-p') }}#ulasan" class="text-gray-500 font-semibold hover:text-[#B5502E] hover:underline">(29 penilaian)</a>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-gray-600 font-semibold">84 terjual</span>
+                </div>
                 <div class="text-xs text-gray-500 mb-5 leading-relaxed">
-                    Jastiper: <span class="font-bold text-gray-800">Bagas P.</span> (FEB UNNES '23) &bull; <span class="text-[#B5502E] font-semibold">Terverifikasi KTM</span>
+                    Jastiper: <a href="{{ route('jastiper.profile', 'bagas-p') }}" class="font-bold text-gray-800 hover:text-[#B5502E] underline decoration-[#EADBD1]">Bagas P.</a> (FEB UNNES '23) &bull; <span class="text-[#B5502E] font-semibold">★ 4.8 Toko</span>
                 </div>
                 
                 <div class="mb-5">
@@ -429,8 +447,14 @@
                     <div class="text-[10px] font-bold text-[#B5502E] bg-[#FDF8F5] border border-[#EADBD1] px-2 py-0.5 rounded">Sisa 3 slot</div>
                 </div>
                 <h3 class="font-extrabold text-lg leading-snug mb-2 group-hover:text-[#B5502E] transition">Tahu Aci Khas Banjaran & Teh Poci Melati</h3>
+                <div class="mb-2.5 flex items-center gap-1.5 text-[11px]">
+                    <span class="inline-flex items-center gap-0.5 rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 font-extrabold text-amber-800"><span class="text-amber-500">★</span> 4.8</span>
+                    <a href="{{ route('jastiper.profile', 'dita-w') }}#ulasan" class="text-gray-500 font-semibold hover:text-[#B5502E] hover:underline">(24 penilaian)</a>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-gray-600 font-semibold">72 terjual</span>
+                </div>
                 <div class="text-xs text-gray-500 mb-5 leading-relaxed">
-                    Jastiper: <span class="font-bold text-gray-800">Dita W.</span> (FISIP UNNES '22) &bull; <span class="text-[#B5502E] font-semibold">Terverifikasi KTM</span>
+                    Jastiper: <a href="{{ route('jastiper.profile', 'dita-w') }}" class="font-bold text-gray-800 hover:text-[#B5502E] underline decoration-[#EADBD1]">Dita W.</a> (FISIP UNNES '22) &bull; <span class="text-[#B5502E] font-semibold">★ 4.8 Toko</span>
                 </div>
                 
                 <div class="mb-5">
@@ -476,10 +500,10 @@
         </div>
 
         <div class="mt-12 flex justify-center">
-            <button class="bg-[#FDF8F5] border border-[#EADBD1] text-[#B5502E] font-bold px-8 py-3 rounded-lg hover:bg-[#F5EBE4] transition flex items-center gap-2">
-                Lihat Semua 28 Jadwal Rute Jastip
+            <a href="{{ route('katalog') }}" class="bg-[#FDF8F5] border border-[#EADBD1] text-[#B5502E] font-bold px-8 py-3 rounded-lg hover:bg-[#F5EBE4] transition flex items-center gap-2">
+                Lihat Semua Jadwal Rute Jastip
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </button>
+            </a>
         </div>
         
         <hr class="border-[#EADBD1] mt-16">

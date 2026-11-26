@@ -177,7 +177,7 @@ class CartController extends Controller
 
         $product = config('catalog.products')[$id] ?? null;
         abort_unless($product, 404);
-        $reserved = Order::query()->where('product_id', $id)->where('status', '!=', 'cancelled')->sum('quantity');
+        $reserved = Order::query()->whereNull('trip_id')->where('product_id', $id)->where('status', '!=', 'cancelled')->sum('quantity');
 
         return [
             'type' => 'sample', 'id' => $id, 'title' => $product['title'],

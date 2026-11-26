@@ -28,7 +28,7 @@ class OrderController extends Controller
             'selesai' => ['completed'],
             'dibatalkan' => ['cancelled'],
         ];
-        $query = $request->user()->orders()->with('trip.jastiper')->latest();
+        $query = $request->user()->orders()->with(['trip.jastiper', 'review'])->latest();
 
         if (isset($filterStatuses[$filter])) {
             $query->whereIn('status', $filterStatuses[$filter]);
@@ -54,7 +54,8 @@ class OrderController extends Controller
         $item = $items[$product];
 
         $order = DB::transaction(function () use ($request, $product, $validated, $item) {
-            $reserved = Order::where('product_id', $product)
+            $reserved = Order::whereNull('trip_id')
+                ->where('product_id', $product)
                 ->where('status', '!=', 'cancelled')
                 ->sum('quantity');
             $available = $item['total'] - $item['terisi'] - $reserved;
@@ -93,5 +94,28 @@ class OrderController extends Controller
         $order->update(['status' => 'cancelled']);
 
         return back()->with('status', 'Pesanan berhasil dibatalkan.');
+    }
+
+    public function complete(Request $request, Order $order): RedirectResponse
+    {
+        abort_unless($order->user_id === $request->user()->id, 403);
+
+        $canCompleteLiveTrip = $order->trip_id !== null && $order->status === 'ready_for_pickup';
+        $canCompleteSample = $order->trip_id === null
+            && ! in_array($order->status, ['completed', 'cancelled'], true)
+            && in_array($order->payment_status, ['submitted', 'paid', 'due_on_pickup'], true);
+
+        if (! $canCompleteLiveTrip && ! $canCompleteSample) {
+            return back()->withErrors([
+                'order' => 'Pesanan belum dapat ditandai diterima pada tahap ini.',
+            ]);
+        }
+
+        $order->update([
+            'status' => 'completed',
+            'payment_status' => 'paid',
+        ]);
+
+        return back()->with('status', 'Pesanan dikonfirmasi telah diterima! Silakan berikan penilaian produk dan toko jastiper.');
     }
 }

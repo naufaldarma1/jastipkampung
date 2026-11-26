@@ -22,6 +22,21 @@ class User extends Authenticatable
         return $this->hasMany(Trip::class);
     }
 
+    public function receivedReviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'jastiper_id');
+    }
+
+    public function writtenReviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'user_id');
+    }
+
+    public function storeSlug(): string
+    {
+        return 'u-'.$this->id;
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -32,6 +47,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'faculty',
+        'origin_city',
+        'store_bio',
     ];
 
     /**

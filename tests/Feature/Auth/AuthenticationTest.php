@@ -19,7 +19,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'pembeli']);
 
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -27,7 +27,20 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('katalog', absolute: false));
+    }
+
+    public function test_jastiper_users_redirect_to_jastiper_dashboard_on_login(): void
+    {
+        $jastiper = User::factory()->create(['role' => 'jastiper']);
+
+        $response = $this->post('/login', [
+            'email' => $jastiper->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard.jastiper', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void

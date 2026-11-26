@@ -71,9 +71,9 @@
             @if (Auth::user()->role === 'pembeli')
                 <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*', 'checkout.*', 'payment.*')">Keranjang ({{ collect(session('cart', []))->sum('quantity') }})</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('pesanan.index')" :active="request()->routeIs('pesanan.*')">Pesanan Saya</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('jastiper.join')" :active="request()->routeIs('jastiper.join')">Jadi Jastiper</x-responsive-nav-link>
             @endif
-            <x-responsive-nav-link href="#">Jadi Jastiper</x-responsive-nav-link>
-            <x-responsive-nav-link :href="$dashboardRoute" :active="request()->routeIs('dashboard.*')">Dashboard</x-responsive-nav-link>
+            <x-responsive-nav-link :href="$dashboardRoute" :active="request()->routeIs('dashboard.*')">{{ Auth::user()->role === 'jastiper' ? 'Dashboard Jastiper' : 'Dashboard' }}</x-responsive-nav-link>
         </div>
         <div class="pt-4 pb-1 border-t border-[#EADBD1]">
             <div class="px-4">

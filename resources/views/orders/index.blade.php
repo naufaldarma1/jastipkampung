@@ -66,9 +66,13 @@
             @forelse ($orders as $order)
                 @php
                     $currentStep = array_search($order->status, array_keys($steps), true);
-                    $jastiperName = $order->trip?->jastiper?->name ?? (config('catalog.products')[$order->product_id]['jastiper'] ?? 'Jastiper Kampung');
+                    $catalogMeta = $order->trip_id === null ? (config('catalog.products')[$order->product_id] ?? null) : null;
+                    $jastiperName = $order->trip?->jastiper?->name ?? ($catalogMeta['jastiper'] ?? 'Jastiper Kampung');
+                    $jastiperSlug = $order->trip?->jastiper ? $order->trip->jastiper->storeSlug() : ($catalogMeta['jastiper_slug'] ?? null);
                     $jastiperEmail = $order->trip?->jastiper?->email;
                     $isCancelled = $order->status === 'cancelled';
+                    $canMarkReceived = ($order->trip_id !== null && $order->status === 'ready_for_pickup')
+                        || ($order->trip_id === null && ! in_array($order->status, ['completed', 'cancelled'], true) && in_array($order->payment_status, ['submitted', 'paid', 'due_on_pickup'], true));
                 @endphp
                 <article class="overflow-hidden rounded-2xl border border-[#EADBD1] bg-white shadow-sm">
                     <div class="flex flex-col gap-3 bg-[#FCEAE4] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -142,21 +146,106 @@
                             <section class="rounded-xl border border-[#F1DED4] bg-white p-4">
                                 <h3 class="flex items-center gap-2 text-sm font-extrabold text-gray-900"><span class="text-[#B5502E]">◉</span> Bantuan & Jastiper</h3>
                                 <p class="mt-2 text-xs leading-relaxed text-gray-600">Koordinasikan jadwal pengambilan dengan jastiper sebelum datang.</p>
-                                <div class="mt-3 flex items-center gap-3 rounded-lg bg-[#FFF5F1] p-3">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#B5502E] text-xs font-extrabold text-white">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($jastiperName, 0, 1)) }}</span>
-                                    <div class="min-w-0">
-                                        <p class="truncate text-xs font-extrabold text-gray-900">{{ $jastiperName }}</p>
-                                        @if ($jastiperEmail)
-                                            <a href="mailto:{{ $jastiperEmail }}" class="break-all text-[10px] font-semibold text-[#B5502E] hover:underline">{{ $jastiperEmail }}</a>
-                                        @else
-                                            <p class="text-[10px] text-gray-500">Kontak jastiper belum tersedia di aplikasi.</p>
-                                        @endif
+                                <div class="mt-3 flex items-center justify-between gap-3 rounded-lg bg-[#FFF5F1] p-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#B5502E] text-xs font-extrabold text-white">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($jastiperName, 0, 1)) }}</span>
+                                        <div class="min-w-0">
+                                            <p class="truncate text-xs font-extrabold text-gray-900">{{ $jastiperName }}</p>
+                                            @if ($jastiperEmail)
+                                                <a href="mailto:{{ $jastiperEmail }}" class="break-all text-[10px] font-semibold text-[#B5502E] hover:underline">{{ $jastiperEmail }}</a>
+                                            @else
+                                                <p class="text-[10px] text-gray-500">Mitra Jastiper Terverifikasi</p>
+                                            @endif
+                                        </div>
                                     </div>
+                                    @if ($jastiperSlug)
+                                        <a href="{{ route('jastiper.profile', $jastiperSlug) }}" class="shrink-0 rounded-md border border-[#EADBD1] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#B5502E] hover:border-[#B5502E]">
+                                            Lihat Toko →
+                                        </a>
+                                    @endif
                                 </div>
                                 @if ($order->checkout_reference)
                                     <a href="{{ route('payment.show', $order->checkout_reference) }}" class="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-[#EADBD1] px-3 py-2 text-xs font-bold text-gray-700 hover:bg-[#FDF8F5]">Lihat Detail Pembayaran</a>
                                 @endif
                             </section>
+                        </div>
+                    @endif
+
+                    @if ($canMarkReceived)
+                        <div class="flex flex-col gap-3 border-t border-[#F5EBE4] bg-[#FDF8F5] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <p class="text-xs font-medium text-gray-600">Sudah menerima titipan sesuai pesanan di titik kumpul? Konfirmasi selesai untuk memberi rating.</p>
+                            <form method="POST" action="{{ route('pesanan.complete', $order) }}">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-[#B5502E] px-4 py-2.5 text-xs font-extrabold text-white shadow-sm hover:bg-[#9E4527]">
+                                    ✓ Pesanan Diterima
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+
+                    @if ($order->status === 'completed')
+                        <div class="border-t border-[#F5EBE4] bg-white px-5 py-5 sm:px-6">
+                            @if ($order->review)
+                                <div class="rounded-xl border border-amber-200 bg-amber-50/50 p-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <p class="text-xs font-extrabold uppercase tracking-wider text-[#B5502E]">Penilaian Anda untuk Pesanan Ini</p>
+                                        @if ($jastiperSlug)
+                                            <a href="{{ route('jastiper.profile', $jastiperSlug) }}#ulasan" class="text-xs font-bold text-[#B5502E] hover:underline">Lihat di Halaman Toko →</a>
+                                        @endif
+                                    </div>
+                                    <div class="mt-2 flex flex-wrap items-center gap-4 text-xs font-bold">
+                                        <span class="text-amber-700">Kualitas Produk: <span class="text-amber-500">@for ($i = 1; $i <= 5; $i++){{ $i <= $order->review->product_rating ? '★' : '☆' }}@endfor</span> ({{ $order->review->product_rating }}/5)</span>
+                                        <span class="text-[#8C5D42]">Pelayanan Toko Jastiper: <span class="text-amber-500">@for ($i = 1; $i <= 5; $i++){{ $i <= $order->review->store_rating ? '★' : '☆' }}@endfor</span> ({{ $order->review->store_rating }}/5)</span>
+                                    </div>
+                                    @if ($order->review->comment)
+                                        <p class="mt-2 text-xs text-gray-700 italic">"{{ $order->review->comment }}"</p>
+                                    @endif
+                                </div>
+                            @else
+                                <form method="POST" action="{{ route('pesanan.review.store', $order) }}" x-data="{ prodStar: 5, storeStar: 5 }" class="rounded-2xl border border-[#EADBD1] bg-[#FDF8F5] p-5 space-y-4">
+                                    @csrf
+                                    <div>
+                                        <p class="text-xs font-extrabold uppercase tracking-wider text-[#B5502E]">Beri Penilaian Produk & Toko Jastiper</p>
+                                        <p class="mt-1 text-xs text-gray-600">Bantu mahasiswa UNNES lainnya mengetahui kualitas titipan dan pelayanan {{ $jastiperName }}.</p>
+                                    </div>
+
+                                    <div class="grid gap-4 sm:grid-cols-2">
+                                        <div class="rounded-xl border border-[#EADBD1] bg-white p-3.5">
+                                            <label class="block text-xs font-extrabold text-gray-800 mb-1.5">1. Penilaian Kualitas Produk</label>
+                                            <input type="hidden" name="product_rating" :value="prodStar">
+                                            <div class="flex items-center gap-1.5">
+                                                @for ($star = 1; $star <= 5; $star++)
+                                                    <button type="button" @click="prodStar = {{ $star }}" class="text-2xl leading-none transition focus:outline-none" :class="prodStar >= {{ $star }} ? 'text-amber-500' : 'text-gray-300'">★</button>
+                                                @endfor
+                                                <span class="ml-2 text-xs font-bold text-[#B5502E]" x-text="prodStar + ' / 5'">5 / 5</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="rounded-xl border border-[#EADBD1] bg-white p-3.5">
+                                            <label class="block text-xs font-extrabold text-gray-800 mb-1.5">2. Penilaian Pelayanan Toko Jastiper</label>
+                                            <input type="hidden" name="store_rating" :value="storeStar">
+                                            <div class="flex items-center gap-1.5">
+                                                @for ($star = 1; $star <= 5; $star++)
+                                                    <button type="button" @click="storeStar = {{ $star }}" class="text-2xl leading-none transition focus:outline-none" :class="storeStar >= {{ $star }} ? 'text-amber-500' : 'text-gray-300'">★</button>
+                                                @endfor
+                                                <span class="ml-2 text-xs font-bold text-[#B5502E]" x-text="storeStar + ' / 5'">5 / 5</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="comment-{{ $order->id }}" class="block text-xs font-bold text-gray-700 mb-1">Ulasan untuk pembeli lain <span class="font-normal text-gray-500">(opsional)</span></label>
+                                        <textarea id="comment-{{ $order->id }}" name="comment" rows="2" maxlength="500" placeholder="Ceritakan kondisi makanan, ketepatan waktu di titik kumpul, atau keramahan jastiper..." class="w-full rounded-lg border-[#EADBD1] text-xs focus:border-[#B5502E] focus:ring-[#B5502E]/20"></textarea>
+                                    </div>
+
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="rounded-lg bg-[#B5502E] px-5 py-2.5 text-xs font-extrabold text-white shadow-sm hover:bg-[#9E4527]">
+                                            Kirim Penilaian ★
+                                        </button>
+                                    </div>
+                                </form>
+                            @endif
                         </div>
                     @endif
 

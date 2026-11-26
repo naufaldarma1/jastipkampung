@@ -3,21 +3,23 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\JastiperController;
+use App\Http\Controllers\JastiperProfileController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\TripOrderController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::view('/', 'home')->name('home');
 
 Route::get('/jadi-jastiper', [JastiperController::class, 'show'])->name('jastiper.join');
+Route::get('/jastiper/{slug}', [JastiperProfileController::class, 'show'])->name('jastiper.profile');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'redirect'])->name('dashboard');
     Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
 
     Route::middleware('role:pembeli')->group(function () {
@@ -40,6 +42,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/katalog/{product}/pesan', [OrderController::class, 'store'])->whereNumber('product')->name('pesanan.store');
     Route::post('/rute/{trip}/pesan', [TripOrderController::class, 'store'])->name('trips.order.store');
     Route::patch('/pesanan/{order}/batal', [OrderController::class, 'cancel'])->name('pesanan.cancel');
+    Route::patch('/pesanan/{order}/selesai', [OrderController::class, 'complete'])->name('pesanan.complete');
+    Route::post('/pesanan/{order}/ulasan', [ReviewController::class, 'store'])->name('pesanan.review.store');
 
     Route::middleware('role:jastiper')->group(function () {
         Route::get('/dashboard-jastiper', [DashboardController::class, 'jastiper'])->name('dashboard.jastiper');

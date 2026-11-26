@@ -47,6 +47,26 @@
             @endif
         </div>
 
+        <div>
+            <x-input-label for="faculty" value="Fakultas & Angkatan UNNES (Opsional)" />
+            <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full" :value="old('faculty', $user->faculty)" placeholder="Contoh: FT UNNES '22" />
+            <x-input-error class="mt-2" :messages="$errors->get('faculty')" />
+        </div>
+
+        @if ($user->role === 'jastiper')
+            <div>
+                <x-input-label for="origin_city" value="Kota Asal Rute Utama" />
+                <x-text-input id="origin_city" name="origin_city" type="text" class="mt-1 block w-full" :value="old('origin_city', $user->origin_city)" placeholder="Contoh: Solo / Purwokerto" />
+                <x-input-error class="mt-2" :messages="$errors->get('origin_city')" />
+            </div>
+
+            <div>
+                <x-input-label for="store_bio" value="Deskripsi Singkat Toko Jastiper" />
+                <textarea id="store_bio" name="store_bio" rows="3" maxlength="500" placeholder="Ceritakan jadwal rutin pulang kampung, cara pengemasan, atau jaminan struk toko asli..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#B5502E] focus:ring-[#B5502E] text-sm">{{ old('store_bio', $user->store_bio) }}</textarea>
+                <x-input-error class="mt-2" :messages="$errors->get('store_bio')" />
+            </div>
+        @endif
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

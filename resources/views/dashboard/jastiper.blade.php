@@ -11,15 +11,26 @@
             <div>
                 <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#B5502E]">Area Jastiper</p>
                 <h1 class="mt-2 text-3xl font-extrabold text-gray-900">Halo, {{ Auth::user()->name }}!</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">Buat PO perjalananmu, tampilkan penawaran di katalog, lalu kelola permintaan titip dari pembeli.</p>
+                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">Buat PO perjalananmu, tampilkan penawaran di katalog, lalu kelola permintaan titip dan reputasi tokomu.</p>
             </div>
-            <a href="{{ route('jastiper.trips.create') }}" class="inline-flex h-fit self-start items-center justify-center whitespace-nowrap rounded-lg bg-[#B5502E] px-5 py-3 text-sm font-bold text-white hover:bg-[#9E4527]">+ Buat PO Baru</a>
+            <div class="flex flex-wrap gap-2.5 self-start">
+                <a href="{{ route('jastiper.profile', $storeProfile['slug']) }}" class="inline-flex h-fit items-center justify-center whitespace-nowrap rounded-lg border border-[#EADBD1] bg-white px-4 py-3 text-sm font-bold text-[#B5502E] hover:border-[#B5502E] hover:bg-[#FDF8F5]">★ Lihat Toko Publik</a>
+                <a href="{{ route('jastiper.trips.create') }}" class="inline-flex h-fit items-center justify-center whitespace-nowrap rounded-lg bg-[#B5502E] px-5 py-3 text-sm font-bold text-white hover:bg-[#9E4527]">+ Buat PO Baru</a>
+            </div>
         </div>
 
-        <div class="mb-8 grid gap-4 sm:grid-cols-3">
+        <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-xl border border-[#EADBD1] bg-white p-5"><p class="text-sm font-semibold text-gray-500">Total PO</p><p class="mt-2 text-2xl font-extrabold text-gray-900">{{ $trips->count() }}</p></div>
             <div class="rounded-xl border border-[#EADBD1] bg-white p-5"><p class="text-sm font-semibold text-gray-500">PO Aktif</p><p class="mt-2 text-2xl font-extrabold text-gray-900">{{ $trips->where('status', 'open')->count() }}</p></div>
             <div class="rounded-xl border border-[#EADBD1] bg-white p-5"><p class="text-sm font-semibold text-gray-500">Permintaan masuk</p><p class="mt-2 text-2xl font-extrabold text-gray-900">{{ $trips->sum(fn ($trip) => $trip->orders->where('status', 'pending')->count()) }}</p></div>
+            <a href="{{ route('jastiper.profile', $storeProfile['slug']) }}#ulasan" class="rounded-xl border border-[#EADBD1] bg-white p-5 hover:border-[#B5502E] transition block">
+                <p class="text-sm font-semibold text-gray-500">Rating Toko</p>
+                <p class="mt-2 flex items-baseline gap-1.5 text-2xl font-extrabold text-[#B5502E]">
+                    <span class="text-amber-500">★</span>
+                    {{ $storeProfile['store_rating'] ? number_format($storeProfile['store_rating'], 1) : 'Baru' }}
+                    <span class="text-xs font-semibold text-gray-500">({{ $storeProfile['total_reviews'] }} ulasan)</span>
+                </p>
+            </a>
         </div>
 
         <div class="mb-4 flex items-end justify-between gap-4">
@@ -76,6 +87,14 @@
                                     <p class="mt-1 text-xs font-bold {{ $order->status === 'pending' ? 'text-amber-700' : ($order->status === 'confirmed' ? 'text-blue-700' : 'text-gray-500') }}">{{ $orderStatusLabels[$order->status] ?? ucfirst($order->status) }}</p>
                                     @if ($order->payment_method)
                                         <p class="mt-1 text-xs text-gray-600">Pembayaran: {{ $paymentLabels[$order->payment_method] ?? $order->payment_method }} · {{ ['unpaid' => 'belum dibayar', 'submitted' => 'perlu diverifikasi', 'due_on_pickup' => 'COD saat pengambilan', 'paid' => 'diterima'][$order->payment_status] ?? $order->payment_status }}</p>
+                                    @endif
+                                    @if ($order->review)
+                                        <p class="mt-1.5 inline-flex flex-wrap items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-900">
+                                            <span>★ Produk {{ $order->review->product_rating }}/5 · Toko {{ $order->review->store_rating }}/5</span>
+                                            @if ($order->review->comment)
+                                                <span class="font-medium text-gray-700">— "{{ $order->review->comment }}"</span>
+                                            @endif
+                                        </p>
                                     @endif
                                 </div>
                                 @if (isset($nextOrderStatuses[$order->status]) && ($order->status !== 'pending' || in_array($order->payment_status, ['paid', 'due_on_pickup'], true)))
