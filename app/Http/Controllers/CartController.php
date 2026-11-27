@@ -6,8 +6,10 @@ use App\Models\Order;
 use App\Models\Trip;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -85,30 +87,35 @@ class CartController extends Controller
             return redirect()->route('katalog')->withErrors(['cart' => 'Keranjangmu masih kosong.']);
         }
 
+        $pickupPointOptions = $this->pickupPointOptions($items);
+        $defaultPickupPoint = $items->first()['pickup_point'] ?? ($pickupPointOptions[0]['name'] ?? '');
+
         return view('checkout.index', [
             'items' => $items,
             'total' => $items->sum('total_price'),
             'itemCount' => $items->sum('quantity'),
+            'pickupPointOptions' => $pickupPointOptions,
+            'selectedPickupPoint' => $request->old('pickup_point', $defaultPickupPoint),
         ]);
     }
 
     public function placeOrder(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'payment_method' => ['required', 'in:qris,bank_transfer,cod'],
-            'pickup_points' => ['required', 'array'],
-        ]);
         $items = $this->cartItems($request);
 
         if ($items->isEmpty()) {
             return redirect()->route('katalog')->withErrors(['cart' => 'Keranjangmu masih kosong.']);
         }
 
-        foreach ($items as $item) {
-            if (($validated['pickup_points'][$item['key']] ?? null) !== $item['pickup_point']) {
-                throw ValidationException::withMessages(['pickup_points' => 'Pilih titik temu yang disediakan untuk setiap titipan.']);
-            }
-        }
+        $allowedPickupPoints = collect($this->pickupPointOptions($items))->pluck('name')->all();
+
+        $validated = $request->validate([
+            'payment_method' => ['required', 'in:qris,bank_transfer,cod'],
+            'pickup_point' => ['required', 'string', 'max:150', Rule::in($allowedPickupPoints)],
+        ], [
+            'pickup_point.required' => 'Pilih satu titik temu resmi untuk pesananmu.',
+            'pickup_point.in' => 'Titik temu yang dipilih tidak tersedia.',
+        ]);
 
         $reference = (string) Str::uuid();
 
@@ -122,7 +129,7 @@ class CartController extends Controller
                     'product_id' => $item['type'] === 'sample' ? $item['id'] : null,
                     'product_title' => $item['title'],
                     'route' => $item['route'],
-                    'pickup_point' => $item['pickup_point'],
+                    'pickup_point' => $validated['pickup_point'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'service_fee' => $item['service_fee'],
@@ -197,6 +204,35 @@ class CartController extends Controller
                 'cart' => 'Kuota untuk '.$item['title'].' berubah. Sisa '.$fresh['available'].' '.$fresh['unit'].'.',
             ]);
         }
+    }
+
+    private function pickupPointOptions(Collection $items): array
+    {
+        $options = collect(config('catalog.pickup_points', []))
+            ->keyBy('name')
+            ->map(fn (array $point) => [...$point, 'recommended' => false])
+            ->all();
+
+        foreach ($items as $item) {
+            $point = trim((string) ($item['pickup_point'] ?? ''));
+
+            if ($point === '') {
+                continue;
+            }
+
+            if (isset($options[$point])) {
+                $options[$point]['recommended'] = true;
+            } else {
+                $options[$point] = [
+                    'name' => $point,
+                    'description' => 'Titik temu yang ditetapkan jastiper untuk rute '.$item['route'].'.',
+                    'badge' => 'Rekomendasi jastiper',
+                    'recommended' => true,
+                ];
+            }
+        }
+
+        return array_values($options);
     }
 
     private function parseKey(string $key): array

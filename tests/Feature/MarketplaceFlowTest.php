@@ -109,15 +109,14 @@ class MarketplaceFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Depan GSG UNNES');
 
-        // Place QRIS order
+        // Place QRIS order with another chosen official pickup point
         $checkoutResponse = $this->actingAs($pembeli)->post(route('checkout.store'), [
             'payment_method' => 'qris',
-            'pickup_points' => [
-                'sample-0' => 'Depan GSG UNNES',
-            ],
+            'pickup_point' => 'Bundaran Konservasi UNNES',
         ]);
 
         $order = Order::firstOrFail();
+        $this->assertSame('Bundaran Konservasi UNNES', $order->pickup_point);
         $this->assertSame('unpaid', $order->payment_status);
         $this->assertSame(40000, $order->total_price);
         $checkoutResponse->assertRedirect(route('payment.show', $order->checkout_reference));
@@ -192,9 +191,7 @@ class MarketplaceFlowTest extends TestCase
 
         $this->actingAs($pembeli)->post(route('checkout.store'), [
             'payment_method' => 'qris',
-            'pickup_points' => [
-                'trip-'.$trip->id => 'Depan GSG UNNES',
-            ],
+            'pickup_point' => 'Depan GSG UNNES',
         ]);
 
         $order = Order::where('trip_id', $trip->id)->firstOrFail();
@@ -235,5 +232,48 @@ class MarketplaceFlowTest extends TestCase
             ->patch(route('jastiper.trips.status', $trip), ['status' => 'open'])
             ->assertSessionHasNoErrors();
         $this->assertSame('open', $trip->fresh()->status);
+    }
+
+    public function test_checkout_allows_selecting_single_official_pickup_point_for_multiple_cart_items(): void
+    {
+        $pembeli = User::factory()->create(['role' => 'pembeli']);
+
+        // Add two sample items with different jastiper pickup points
+        $this->actingAs($pembeli)->post(route('cart.add'), ['type' => 'sample', 'id' => 1, 'quantity' => 1])->assertSessionHasNoErrors();
+        $this->actingAs($pembeli)->post(route('cart.add'), ['type' => 'sample', 'id' => 3, 'quantity' => 1])->assertSessionHasNoErrors();
+
+        $response = $this->actingAs($pembeli)->get(route('checkout.index'));
+        $response->assertOk()
+            ->assertSee('name="pickup_point"', false)
+            ->assertDontSee('name="pickup_points[', false)
+            ->assertSee('Depan GSG UNNES')
+            ->assertSee('Simpang Banaran UNNES')
+            ->assertSee('Bundaran Konservasi UNNES')
+            ->assertSee('Lapangan Rektorat UNNES')
+            ->assertSee('Sekitar FTIK');
+
+        preg_match_all('/<input[^>]+name="pickup_point"[^>]*>/', $response->getContent(), $radioInputs);
+        $checkedRadios = array_filter($radioInputs[0] ?? [], fn (string $tag) => str_contains($tag, 'checked'));
+        $this->assertCount(1, $checkedRadios);
+
+        // Reject arbitrary pickup point not in allowed list
+        $this->actingAs($pembeli)
+            ->post(route('checkout.store'), [
+                'payment_method' => 'cod',
+                'pickup_point' => 'Lokasi Sembarang',
+            ])
+            ->assertSessionHasErrors('pickup_point');
+
+        // Accept valid chosen pickup point and persist to all created orders
+        $this->actingAs($pembeli)
+            ->post(route('checkout.store'), [
+                'payment_method' => 'cod',
+                'pickup_point' => 'Depan GSG UNNES',
+            ])
+            ->assertRedirect();
+
+        $orders = Order::all();
+        $this->assertCount(2, $orders);
+        $this->assertTrue($orders->every(fn (Order $order) => $order->pickup_point === 'Depan GSG UNNES'));
     }
 }

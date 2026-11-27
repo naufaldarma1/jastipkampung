@@ -3,6 +3,34 @@
 return [
     'cities' => ['Solo', 'Purwokerto', 'Kudus', 'Tegal', 'Pekalongan', 'Semarang'],
 
+    'pickup_points' => [
+        [
+            'name' => 'Depan GSG UNNES',
+            'description' => 'Area parkir depan Gedung Serba Guna UNNES Sekaran, mudah dijangkau dari jalan utama.',
+            'badge' => 'Paling ramai',
+        ],
+        [
+            'name' => 'Simpang Banaran UNNES',
+            'description' => 'Dekat kawasan kos Banaran dan akses selatan kampus UNNES.',
+            'badge' => 'Dekat kos',
+        ],
+        [
+            'name' => 'Bundaran Konservasi UNNES',
+            'description' => 'Titik sentral gerbang utama UNNES, praktis untuk ambil cepat.',
+            'badge' => 'Akses utama',
+        ],
+        [
+            'name' => 'Lapangan Rektorat UNNES',
+            'description' => 'Area terbuka depan Gedung H Rektorat UNNES.',
+            'badge' => 'Area kampus',
+        ],
+        [
+            'name' => 'Sekitar FTIK',
+            'description' => 'Titik temu area fakultas sisi utara kampus UNNES Sekaran.',
+            'badge' => 'Area fakultas',
+        ],
+    ],
+
     'products' => [
         [
             'rute' => 'Solo -> Sekaran',

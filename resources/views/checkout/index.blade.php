@@ -5,7 +5,7 @@
             <h1 class="mt-2 text-3xl font-extrabold text-gray-900">Konfirmasi & Pembayaran Pre-Order</h1>
             <div class="mt-3 flex flex-wrap gap-2 text-xs font-bold text-gray-700">
                 <span class="rounded-full bg-[#F5EBE4] px-3 py-1.5">{{ $itemCount }} item dalam pesanan</span>
-                <span class="rounded-full bg-[#F5EBE4] px-3 py-1.5">Titik temu mengikuti jadwal jastiper</span>
+                <span class="rounded-full bg-[#F5EBE4] px-3 py-1.5">Pilih 1 titik temu resmi di UNNES</span>
             </div>
         </div>
 
@@ -19,19 +19,23 @@
                 <div class="mb-4 flex items-center justify-between gap-3 border-b border-[#F5EBE4] pb-4">
                     <div>
                         <h2 class="font-extrabold text-gray-900">1. Pilih Titik Kumpul di UNNES</h2>
-                        <p class="mt-1 text-xs text-gray-600">Setiap jastiper menetapkan titik temu untuk rutenya.</p>
+                        <p class="mt-1 text-xs text-gray-600">Pilih satu titik temu resmi di area UNNES untuk pengambilan pesananmu.</p>
                     </div>
                     <span class="rounded bg-[#FDF8F5] px-2 py-1 text-[10px] font-bold uppercase text-[#B5502E]">Titik resmi</span>
                 </div>
                 <div class="space-y-3">
-                    @foreach ($items as $item)
+                    @foreach ($pickupPointOptions as $point)
                         <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-[#EADBD1] p-4 hover:border-[#B5502E] has-[:checked]:border-[#B5502E] has-[:checked]:bg-[#FDF8F5]">
-                            <input type="radio" name="pickup_points[{{ $item['key'] }}]" value="{{ $item['pickup_point'] }}" required checked class="mt-1 border-[#DCC4B5] text-[#B5502E] focus:ring-[#B5502E]">
+                            <input type="radio" name="pickup_point" value="{{ $point['name'] }}" required @checked($selectedPickupPoint === $point['name']) class="mt-1 border-[#DCC4B5] text-[#B5502E] focus:ring-[#B5502E]">
                             <span class="min-w-0 flex-1">
-                                <span class="block text-sm font-extrabold text-gray-900">{{ $item['pickup_point'] }}</span>
-                                <span class="mt-1 block text-xs text-gray-600">{{ $item['title'] }} · {{ $item['route'] }}</span>
+                                <span class="block text-sm font-extrabold text-gray-900">{{ $point['name'] }}</span>
+                                <span class="mt-1 block text-xs text-gray-600">{{ $point['description'] }}</span>
                             </span>
-                            <span class="rounded-full bg-[#F5EBE4] px-2 py-1 text-[10px] font-bold text-[#B5502E]">Titik temu</span>
+                            @if (! empty($point['recommended']))
+                                <span class="shrink-0 rounded-full bg-[#B5502E] px-2.5 py-1 text-[10px] font-bold text-white">Rekomendasi jastiper</span>
+                            @else
+                                <span class="shrink-0 rounded-full bg-[#F5EBE4] px-2.5 py-1 text-[10px] font-bold text-[#B5502E]">{{ $point['badge'] ?? 'Titik resmi' }}</span>
+                            @endif
                         </label>
                     @endforeach
                 </div>
@@ -47,8 +51,8 @@
                         <div class="flex items-start justify-between gap-4 rounded-xl bg-[#FDF8F5] p-4">
                             <div>
                                 <p class="font-extrabold text-gray-900">{{ $item['title'] }}</p>
-                                <p class="mt-1 text-xs text-gray-600">{{ $item['quantity'] }} {{ $item['unit'] }} · {{ $item['route'] }}</p>
-                                <p class="mt-1 text-[11px] text-gray-500">Titik ambil: {{ $item['pickup_point'] }}</p>
+                                <p class="mt-1 text-xs text-gray-600">{{ $item['quantity'] }} {{ $item['unit'] }} · {{ str_replace('->', '→', $item['route']) }}</p>
+                                <p class="mt-1 text-[11px] text-gray-500">Rekomendasi titik jastiper: {{ $item['pickup_point'] }} · mengikuti titik pilihan di Langkah 1</p>
                             </div>
                             <p class="shrink-0 text-sm font-extrabold text-gray-900">Rp {{ number_format($item['total_price'], 0, ',', '.') }}</p>
                         </div>
