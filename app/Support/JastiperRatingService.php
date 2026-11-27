@@ -189,8 +189,8 @@ class JastiperRatingService
                     'terisi' => $reserved,
                     'total' => $trip->quota,
                     'satuan_kuota' => $trip->unit,
-                    'countdown' => $trip->order_deadline->diffForHumans(),
-                    'kembali' => $trip->return_at->timezone('Asia/Jakarta')->format('D, H:i').' WIB',
+                    'countdown' => $trip->countdownLabel(),
+                    'kembali' => $trip->returnScheduleLabel(),
                     'kumpul' => $trip->pickup_point,
                     'harga' => $trip->price,
                     'satuan_harga' => $trip->unit,
@@ -214,7 +214,7 @@ class JastiperRatingService
             'store_rating' => $rev->store_rating,
             'overall_star' => max(1, min(5, (int) $rev->product_rating)),
             'comment' => $rev->comment,
-            'date' => $rev->created_at->diffForHumans(),
+            'date' => $rev->created_at->copy()->locale('id')->diffForHumans(),
         ])->all();
 
         return [
@@ -225,7 +225,7 @@ class JastiperRatingService
             'faculty' => $user->faculty ?: 'Mahasiswa UNNES',
             'origin_city' => $user->origin_city ?: ($trips->first()?->origin ?? 'Kampus UNNES Sekaran'),
             'bio' => $user->store_bio ?: 'Mitra Jastiper mahasiswa UNNES. Melayani titipan kuliner daerah dengan serah terima aman di area kampus Sekaran.',
-            'joined_label' => $user->created_at ? $user->created_at->diffForHumans() : 'Baru bergabung',
+            'joined_label' => $user->created_at ? $user->created_at->copy()->locale('id')->diffForHumans() : 'Baru bergabung',
             'on_time_rate' => $completedOrders > 0 ? '100%' : 'Baru',
             'response_rate' => 'Aktif',
             'store_rating' => $storeRating,
@@ -308,7 +308,7 @@ class JastiperRatingService
             'store_rating' => $rev->store_rating,
             'overall_star' => max(1, min(5, (int) $rev->product_rating)),
             'comment' => $rev->comment,
-            'date' => $rev->created_at->diffForHumans(),
+            'date' => $rev->created_at->copy()->locale('id')->diffForHumans(),
         ])->all();
 
         $sampleReviewsFormatted = collect($info['sample_reviews'] ?? [])->map(fn (array $rev) => [

@@ -276,4 +276,47 @@ class MarketplaceFlowTest extends TestCase
         $this->assertCount(2, $orders);
         $this->assertTrue($orders->every(fn (Order $order) => $order->pickup_point === 'Depan GSG UNNES'));
     }
+
+    public function test_live_trip_katalog_and_store_profile_display_indonesian_countdown_and_schedule(): void
+    {
+        $jastiper = User::factory()->create(['role' => 'jastiper', 'name' => 'Raihandoko']);
+        $pembeli = User::factory()->create(['role' => 'pembeli']);
+
+        $trip = Trip::create([
+            'user_id' => $jastiper->id,
+            'title' => 'Cookies Sarawak Spesial',
+            'origin' => 'Sarawak',
+            'destination' => 'Sekaran, UNNES',
+            'description' => 'Oleh-oleh khas Sarawak.',
+            'quota' => 23,
+            'unit' => 'paket',
+            'price' => 40000,
+            'service_fee' => 5000,
+            'order_deadline' => now()->addDays(35),
+            'return_at' => \Carbon\Carbon::parse('2026-12-02 22:29:00', 'Asia/Jakarta'),
+            'pickup_point' => 'Embung UNNES',
+            'status' => 'open',
+        ]);
+
+        $this->assertStringContainsString('bulan', $trip->countdownLabel());
+        $this->assertStringContainsString('lagi', $trip->countdownLabel());
+        $this->assertStringNotContainsString('from now', $trip->countdownLabel());
+        $this->assertSame('Rabu, 22:29 WIB', $trip->returnScheduleLabel());
+
+        $this->actingAs($pembeli)
+            ->get(route('katalog', ['search' => 'Cookies Sarawak']))
+            ->assertOk()
+            ->assertSee('PO Ditutup:')
+            ->assertSee('bulan')
+            ->assertSee('lagi')
+            ->assertSee('Rabu, 22:29 WIB')
+            ->assertDontSee('from now')
+            ->assertDontSee('Wed, 22:29 WIB');
+
+        $this->get(route('jastiper.profile', $jastiper->storeSlug()))
+            ->assertOk()
+            ->assertSee('Rabu, 22:29 WIB')
+            ->assertDontSee('from now')
+            ->assertDontSee('Wed, 22:29 WIB');
+    }
 }

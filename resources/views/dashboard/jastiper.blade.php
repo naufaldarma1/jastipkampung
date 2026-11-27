@@ -67,7 +67,7 @@
                     <dl class="mt-5 grid gap-4 border-t border-[#F5EBE4] pt-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
                         <div><dt class="text-xs font-semibold text-gray-500">Kuota terisi</dt><dd class="mt-1 font-bold text-gray-800">{{ (int) $trip->reserved_quantity }} / {{ $trip->quota }} {{ $trip->unit }}</dd></div>
                         <div><dt class="text-xs font-semibold text-gray-500">Harga per unit</dt><dd class="mt-1 font-bold text-gray-800">Rp {{ number_format($trip->price + $trip->service_fee, 0, ',', '.') }}</dd></div>
-                        <div><dt class="text-xs font-semibold text-gray-500">Batas pemesanan</dt><dd class="mt-1 font-bold text-gray-800">{{ $trip->order_deadline->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</dd></div>
+                        <div><dt class="text-xs font-semibold text-gray-500">Batas pemesanan</dt><dd class="mt-1 font-bold text-gray-800">{{ $trip->order_deadline->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') }} WIB</dd></div>
                         <div><dt class="text-xs font-semibold text-gray-500">Titik temu</dt><dd class="mt-1 font-bold text-gray-800">{{ $trip->pickup_point }}</dd></div>
                     </dl>
 

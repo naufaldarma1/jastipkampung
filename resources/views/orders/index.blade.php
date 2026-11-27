@@ -81,7 +81,7 @@
                                 <span class="rounded-full bg-[#B5502E] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white">PO #JK-{{ str_pad((string) $order->id, 5, '0', STR_PAD_LEFT) }}</span>
                                 <span class="text-sm font-extrabold text-gray-900">{{ $order->route }}</span>
                             </div>
-                            <p class="mt-1 text-xs text-gray-600">Dibuat {{ $order->created_at->format('d M Y, H:i') }}</p>
+                            <p class="mt-1 text-xs text-gray-600">Dibuat {{ $order->created_at->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') }} WIB</p>
                         </div>
                         <span class="inline-flex w-fit items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold {{ $statusClasses[$order->status] ?? 'text-gray-700' }}">
                             <span class="h-1.5 w-1.5 rounded-full bg-current"></span>{{ $statusLabels[$order->status] ?? ucfirst($order->status) }}
