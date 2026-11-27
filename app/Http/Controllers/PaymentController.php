@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
@@ -67,6 +68,10 @@ class PaymentController extends Controller
 
     private function ownedOrders(Request $request, string $reference)
     {
+        if (! Str::isUuid($reference)) {
+            return collect();
+        }
+
         return Order::query()
             ->where('user_id', $request->user()->id)
             ->where('checkout_reference', $reference)
